@@ -3,9 +3,10 @@ import { DeployFunction } from "hardhat-deploy/types";
 
 const deployYourContract: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await hre.getNamedAccounts();
-  const { deploy, execute, get } = hre.deployments;
+  const { deploy, execute } = hre.deployments;
 
-  await deploy("Identity", {
+  // OnchainID 배포
+  const identity = await deploy("Identity", {
     from: deployer,
     args: [
       deployer, // initialManagementKey
@@ -15,61 +16,74 @@ const deployYourContract: DeployFunction = async function (hre: HardhatRuntimeEn
     autoMine: true,
   });
 
-  const trexFactory = await deploy("TREXFactory", {
+  // 구현체 컨트랙트들 배포
+  const factory = await deploy("TREXFactory", {
     from: deployer,
     args: [],
     log: true,
     autoMine: true,
   });
 
-  await deploy("Token", {
+  const token = await deploy("Token", {
     from: deployer,
     args: [],
     log: true,
     autoMine: true,
   });
 
-  await deploy("ClaimTopicsRegistry", {
+  const ctr = await deploy("ClaimTopicsRegistry", {
     from: deployer,
     args: [],
     log: true,
     autoMine: true,
   });
 
-  const identityRegistry = await deploy("IdentityRegistry", {
+  const ir = await deploy("IdentityRegistry", {
     from: deployer,
     args: [],
     log: true,
     autoMine: true,
   });
 
-  await deploy("IdentityRegistryStorage", {
+  const irs = await deploy("IdentityRegistryStorage", {
     from: deployer,
     args: [],
     log: true,
     autoMine: true,
   });
 
-  await deploy("ModularCompliance", {
+  const mc = await deploy("ModularCompliance", {
     from: deployer,
     args: [],
     log: true,
     autoMine: true,
   });
 
-  await deploy("TrustedIssuersRegistry", {
+  const tir = await deploy("TrustedIssuersRegistry", {
     from: deployer,
     args: [],
     log: true,
     autoMine: true,
   });
 
-  await execute("IdentityRegistryStorage", { from: deployer, log: true }, "transferOwnership", trexFactory.address);
-  await execute("ClaimTopicsRegistry", { from: deployer, log: true }, "transferOwnership", trexFactory.address);
-  await execute("TrustedIssuersRegistry", { from: deployer, log: true }, "transferOwnership", trexFactory.address);
-  await execute("ModularCompliance", { from: deployer, log: true }, "transferOwnership", trexFactory.address);
-  await execute("IdentityRegistry", { from: deployer, log: true }, "transferOwnership", trexFactory.address);
-  await execute("Token", { from: deployer, log: true }, "transferOwnership", trexFactory.address);
+  const authority = await deploy("TREXImplementationAuthority", {
+    from: deployer,
+    args: [token.address, ctr.address, ir.address, irs.address, tir.address, mc.address],
+    log: true,
+    autoMine: true,
+  });
+
+  // TREXFactory에 ImplementationAuthority 설정
+  await execute(
+    "TREXFactory",
+    {
+      from: deployer,
+      log: true,
+      autoMine: true,
+    },
+    "setImplementationAuthority",
+    authority.address,
+  );
 };
 
 export default deployYourContract;
@@ -83,4 +97,5 @@ deployYourContract.tags = [
   "IdentityRegistryStorage",
   "ModularCompliance",
   "TrustedIssuersRegistry",
+  "TREXImplementationAuthority",
 ];

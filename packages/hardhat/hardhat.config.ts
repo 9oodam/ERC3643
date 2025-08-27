@@ -31,7 +31,7 @@ const config: HardhatUserConfig = {
       },
     ],
   },
-  defaultNetwork: "sepolia",
+  defaultNetwork: "localhost",
   namedAccounts: {
     deployer: {
       default: 0,

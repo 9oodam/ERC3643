@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import type { NextPage } from "next";
 import { useAccount, useReadContract } from "wagmi";
@@ -17,7 +17,7 @@ interface TokenInfo {
   isOwner: boolean;
 }
 
-const Mint: NextPage = () => {
+const Load: NextPage = () => {
   const { address } = useAccount();
   const [tokenAddress, setTokenAddress] = useState<string>("");
   const [salt, setSalt] = useState<string>("");
@@ -101,19 +101,23 @@ const Mint: NextPage = () => {
       tokenSymbol: tokenSymbol,
       tokenDecimals: tokenDecimals,
     });
-    // if (tokenAddress && tokenName && tokenSymbol && tokenDecimals !== undefined) {
-    //   setTokenInfo({
-    //     address: tokenAddress,
-    //     name: tokenName || "",
-    //     symbol: tokenSymbol || "",
-    //     decimals: tokenDecimals || 0,
-    //     balance: tokenBalance ? ethers.formatUnits(tokenBalance, tokenDecimals) : "0",
-    //     isVerified: isVerified || false,
-    //     isAgent: isAgent || false,
-    //     isOwner: tokenOwner ? tokenOwner.toLowerCase() === address?.toLowerCase() : false,
-    //   });
-    // }
+    setTokenInfo({
+      address: tokenAddress,
+      name: tokenName || "",
+      symbol: tokenSymbol || "",
+      decimals: tokenDecimals || 0,
+      balance: tokenBalance ? ethers.formatUnits(tokenBalance, tokenDecimals) : "0",
+      isVerified: isVerified || false,
+      isAgent: isAgent || false,
+      isOwner: tokenOwner ? tokenOwner.toLowerCase() === address?.toLowerCase() : false,
+    });
   }, [tokenAddress, tokenName, tokenSymbol, tokenDecimals, tokenBalance, isVerified, isAgent, tokenOwner, address]);
+
+  const { data: tokenAddressBySalt } = useScaffoldReadContract({
+    contractName: "TREXFactory",
+    functionName: "getToken",
+    args: [salt],
+  });
 
   // Salt 로 token address 찾기
   const handleGetToken = async () => {
@@ -124,54 +128,17 @@ const Mint: NextPage = () => {
 
     try {
       setLoading(true);
-      // This will trigger the TREXFactory.getToken read
-      // The result will be in trexFactoryData
+      if (tokenAddressBySalt && tokenAddressBySalt !== "0x0000000000000000000000000000000000000000") {
+        console.log("Token Address:", tokenAddressBySalt);
+        alert(`Token found at: ${tokenAddressBySalt}`);
+      } else {
+        alert("No token found for this salt");
+      }
     } catch (error) {
       console.error("Error getting token:", error);
       alert("Error getting token address");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleRegisterIdentity = async () => {
-    if (!address || !identityRegistryAddress) {
-      alert("Please connect wallet and ensure token is loaded");
-      return;
-    }
-
-    try {
-      await registerIdentity({
-        functionName: "registerIdentity",
-        args: [
-          address, // investor address
-          "0x0000000000000000000000000000000000000000", // onchainID (zero address for now)
-          0, // country code
-        ],
-      });
-      alert("Identity registered successfully!");
-    } catch (error) {
-      console.error("Error registering identity:", error);
-      alert("Error registering identity");
-    }
-  };
-
-  const handleMint = async () => {
-    if (!address || !mintAmount || !tokenInfo) {
-      alert("Please connect wallet and enter mint amount");
-      return;
-    }
-
-    try {
-      const amount = ethers.parseUnits(mintAmount, tokenInfo.decimals);
-      await mint({
-        functionName: "mint",
-        args: [address, amount],
-      });
-      alert("Tokens minted successfully!");
-    } catch (error) {
-      console.error("Error minting tokens:", error);
-      alert("Error minting tokens");
     }
   };
 
@@ -220,7 +187,9 @@ const Mint: NextPage = () => {
           <div className="mt-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
             <p>Token found at: {trexFactoryData}</p>
             <button
-              onClick={() => setTokenAddress(trexFactoryData)}
+              onClick={() => {
+                setTokenAddress(trexFactoryData);
+              }}
               className="mt-2 px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
             >
               Load This Token
@@ -307,85 +276,6 @@ const Mint: NextPage = () => {
         </div>
       )}
 
-      {/* Actions */}
-      {tokenInfo && (
-        <div className="bg-base-100 p-6 rounded-lg shadow-lg">
-          <h2 className="text-xl font-semibold mb-4">Actions</h2>
-
-          <div className="space-y-4">
-            {/* Register Identity */}
-            {!tokenInfo.isVerified && tokenInfo.isAgent && (
-              <div className="p-4 bg-yellow-100 border border-yellow-400 rounded-lg">
-                <h3 className="font-semibold mb-2">Step 1: Register Identity</h3>
-                <p className="text-sm text-gray-600 mb-3">
-                  You need to register your identity before you can mint tokens.
-                </p>
-                <button
-                  onClick={handleRegisterIdentity}
-                  disabled={isRegistering}
-                  className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 disabled:opacity-50"
-                >
-                  {isRegistering ? "Registering..." : "Register Identity"}
-                </button>
-              </div>
-            )}
-
-            {/* Mint Tokens */}
-            {tokenInfo.isVerified && tokenInfo.isAgent && (
-              <div className="p-4 bg-blue-100 border border-blue-400 rounded-lg">
-                <h3 className="font-semibold mb-2">Step 2: Mint Tokens</h3>
-                <div className="flex gap-2 items-end">
-                  <div className="flex-1">
-                    <label className="block text-sm font-medium mb-1">Amount to Mint</label>
-                    <input
-                      type="number"
-                      value={mintAmount}
-                      onChange={e => setMintAmount(e.target.value)}
-                      placeholder="1000"
-                      className="w-full p-2 border rounded"
-                    />
-                  </div>
-                  <button
-                    onClick={handleMint}
-                    disabled={isMinting}
-                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
-                  >
-                    {isMinting ? "Minting..." : `Mint ${tokenInfo.symbol}`}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Status Messages */}
-            {!tokenInfo.isAgent && (
-              <div className="p-4 bg-red-100 border border-red-400 rounded-lg">
-                <h3 className="font-semibold mb-2">⚠️ Action Required</h3>
-                <p className="text-sm text-red-700">
-                  You are not a token agent. You need to be added as a token agent to mint tokens. This should be done
-                  during token deployment or by the token owner.
-                </p>
-              </div>
-            )}
-
-            {tokenInfo.isAgent && !tokenInfo.isVerified && (
-              <div className="p-4 bg-orange-100 border border-orange-400 rounded-lg">
-                <h3 className="font-semibold mb-2">⚠️ Identity Verification Required</h3>
-                <p className="text-sm text-orange-700">
-                  You are a token agent but your identity is not verified. Please register your identity first.
-                </p>
-              </div>
-            )}
-
-            {tokenInfo.isVerified && tokenInfo.isAgent && (
-              <div className="p-4 bg-green-100 border border-green-400 rounded-lg">
-                <h3 className="font-semibold mb-2">✅ Ready to Mint</h3>
-                <p className="text-sm text-green-700">All requirements are met! You can now mint tokens.</p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
       {/* Instructions */}
       <div className="mt-6 bg-gray-100 p-6 rounded-lg">
         <h2 className="text-xl font-semibold mb-4">Instructions</h2>
@@ -393,12 +283,10 @@ const Mint: NextPage = () => {
           <li>Enter the token address or salt to load your deployed token</li>
           <li>Check your status (Owner, Agent, Identity Verification)</li>
           <li>If you're an agent but not verified, register your identity first</li>
-          <li>Once verified and an agent, you can mint tokens</li>
-          <li>Enter the amount and click "Mint" to create new tokens</li>
         </ol>
       </div>
     </div>
   );
 };
 
-export default Mint;
+export default Load;

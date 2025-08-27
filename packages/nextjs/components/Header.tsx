@@ -25,8 +25,8 @@ export const menuLinks: HeaderMenuLink[] = [
     href: "/deploy",
   },
   {
-    label: "Mint",
-    href: "/mint",
+    label: "Load",
+    href: "/load",
   },
   {
     label: "Debug Contracts",

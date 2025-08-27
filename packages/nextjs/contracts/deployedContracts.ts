@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     ClaimTopicsRegistry: {
-      address: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+      address: "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
       abi: [
         {
           anonymous: false,
@@ -148,10 +148,764 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 5,
+      deployedOnBlock: 7,
+    },
+    Identity: {
+      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      abi: [
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "initialManagementKey",
+              type: "address",
+            },
+            {
+              internalType: "bool",
+              name: "_isLibrary",
+              type: "bool",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "constructor",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "executionId",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "bool",
+              name: "approved",
+              type: "bool",
+            },
+          ],
+          name: "Approved",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "bytes32",
+              name: "claimId",
+              type: "bytes32",
+            },
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "topic",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "scheme",
+              type: "uint256",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "issuer",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "bytes",
+              name: "signature",
+              type: "bytes",
+            },
+            {
+              indexed: false,
+              internalType: "bytes",
+              name: "data",
+              type: "bytes",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "uri",
+              type: "string",
+            },
+          ],
+          name: "ClaimAdded",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "bytes32",
+              name: "claimId",
+              type: "bytes32",
+            },
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "topic",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "scheme",
+              type: "uint256",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "issuer",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "bytes",
+              name: "signature",
+              type: "bytes",
+            },
+            {
+              indexed: false,
+              internalType: "bytes",
+              name: "data",
+              type: "bytes",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "uri",
+              type: "string",
+            },
+          ],
+          name: "ClaimChanged",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "bytes32",
+              name: "claimId",
+              type: "bytes32",
+            },
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "topic",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "scheme",
+              type: "uint256",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "issuer",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "bytes",
+              name: "signature",
+              type: "bytes",
+            },
+            {
+              indexed: false,
+              internalType: "bytes",
+              name: "data",
+              type: "bytes",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "uri",
+              type: "string",
+            },
+          ],
+          name: "ClaimRemoved",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "executionId",
+              type: "uint256",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "to",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "value",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "bytes",
+              name: "data",
+              type: "bytes",
+            },
+          ],
+          name: "Executed",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "executionId",
+              type: "uint256",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "to",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "value",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "bytes",
+              name: "data",
+              type: "bytes",
+            },
+          ],
+          name: "ExecutionFailed",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "executionId",
+              type: "uint256",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "to",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "value",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "bytes",
+              name: "data",
+              type: "bytes",
+            },
+          ],
+          name: "ExecutionRequested",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "bytes32",
+              name: "key",
+              type: "bytes32",
+            },
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "purpose",
+              type: "uint256",
+            },
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "keyType",
+              type: "uint256",
+            },
+          ],
+          name: "KeyAdded",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "bytes32",
+              name: "key",
+              type: "bytes32",
+            },
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "purpose",
+              type: "uint256",
+            },
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "keyType",
+              type: "uint256",
+            },
+          ],
+          name: "KeyRemoved",
+          type: "event",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_topic",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "_scheme",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "_issuer",
+              type: "address",
+            },
+            {
+              internalType: "bytes",
+              name: "_signature",
+              type: "bytes",
+            },
+            {
+              internalType: "bytes",
+              name: "_data",
+              type: "bytes",
+            },
+            {
+              internalType: "string",
+              name: "_uri",
+              type: "string",
+            },
+          ],
+          name: "addClaim",
+          outputs: [
+            {
+              internalType: "bytes32",
+              name: "claimRequestId",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "bytes32",
+              name: "_key",
+              type: "bytes32",
+            },
+            {
+              internalType: "uint256",
+              name: "_purpose",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "_type",
+              type: "uint256",
+            },
+          ],
+          name: "addKey",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "success",
+              type: "bool",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_id",
+              type: "uint256",
+            },
+            {
+              internalType: "bool",
+              name: "_approve",
+              type: "bool",
+            },
+          ],
+          name: "approve",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "success",
+              type: "bool",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_to",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "_value",
+              type: "uint256",
+            },
+            {
+              internalType: "bytes",
+              name: "_data",
+              type: "bytes",
+            },
+          ],
+          name: "execute",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "executionId",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "payable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "bytes32",
+              name: "_claimId",
+              type: "bytes32",
+            },
+          ],
+          name: "getClaim",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "topic",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "scheme",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "issuer",
+              type: "address",
+            },
+            {
+              internalType: "bytes",
+              name: "signature",
+              type: "bytes",
+            },
+            {
+              internalType: "bytes",
+              name: "data",
+              type: "bytes",
+            },
+            {
+              internalType: "string",
+              name: "uri",
+              type: "string",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_topic",
+              type: "uint256",
+            },
+          ],
+          name: "getClaimIdsByTopic",
+          outputs: [
+            {
+              internalType: "bytes32[]",
+              name: "claimIds",
+              type: "bytes32[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "bytes32",
+              name: "_key",
+              type: "bytes32",
+            },
+          ],
+          name: "getKey",
+          outputs: [
+            {
+              internalType: "uint256[]",
+              name: "purposes",
+              type: "uint256[]",
+            },
+            {
+              internalType: "uint256",
+              name: "keyType",
+              type: "uint256",
+            },
+            {
+              internalType: "bytes32",
+              name: "key",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "bytes32",
+              name: "_key",
+              type: "bytes32",
+            },
+          ],
+          name: "getKeyPurposes",
+          outputs: [
+            {
+              internalType: "uint256[]",
+              name: "_purposes",
+              type: "uint256[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_purpose",
+              type: "uint256",
+            },
+          ],
+          name: "getKeysByPurpose",
+          outputs: [
+            {
+              internalType: "bytes32[]",
+              name: "keys",
+              type: "bytes32[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "bytes",
+              name: "sig",
+              type: "bytes",
+            },
+            {
+              internalType: "bytes32",
+              name: "dataHash",
+              type: "bytes32",
+            },
+          ],
+          name: "getRecoveredAddress",
+          outputs: [
+            {
+              internalType: "address",
+              name: "addr",
+              type: "address",
+            },
+          ],
+          stateMutability: "pure",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "initialManagementKey",
+              type: "address",
+            },
+          ],
+          name: "initialize",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "contract IIdentity",
+              name: "_identity",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "claimTopic",
+              type: "uint256",
+            },
+            {
+              internalType: "bytes",
+              name: "sig",
+              type: "bytes",
+            },
+            {
+              internalType: "bytes",
+              name: "data",
+              type: "bytes",
+            },
+          ],
+          name: "isClaimValid",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "claimValid",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "bytes32",
+              name: "_key",
+              type: "bytes32",
+            },
+            {
+              internalType: "uint256",
+              name: "_purpose",
+              type: "uint256",
+            },
+          ],
+          name: "keyHasPurpose",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "result",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "bytes32",
+              name: "_claimId",
+              type: "bytes32",
+            },
+          ],
+          name: "removeClaim",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "success",
+              type: "bool",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "bytes32",
+              name: "_key",
+              type: "bytes32",
+            },
+            {
+              internalType: "uint256",
+              name: "_purpose",
+              type: "uint256",
+            },
+          ],
+          name: "removeKey",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "success",
+              type: "bool",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "version",
+          outputs: [
+            {
+              internalType: "string",
+              name: "",
+              type: "string",
+            },
+          ],
+          stateMutability: "pure",
+          type: "function",
+        },
+      ],
+      inheritedFunctions: {
+        addClaim: "contracts/interface/IIdentity.sol",
+        addKey: "contracts/interface/IIdentity.sol",
+        approve: "contracts/interface/IIdentity.sol",
+        execute: "contracts/interface/IIdentity.sol",
+        getClaim: "contracts/interface/IIdentity.sol",
+        getClaimIdsByTopic: "contracts/interface/IIdentity.sol",
+        getKey: "contracts/interface/IIdentity.sol",
+        getKeyPurposes: "contracts/interface/IIdentity.sol",
+        getKeysByPurpose: "contracts/interface/IIdentity.sol",
+        isClaimValid: "contracts/interface/IIdentity.sol",
+        keyHasPurpose: "contracts/interface/IIdentity.sol",
+        removeClaim: "contracts/interface/IIdentity.sol",
+        removeKey: "contracts/interface/IIdentity.sol",
+        version: "contracts/version/Version.sol",
+      },
+      deployedOnBlock: 1,
     },
     IdentityRegistry: {
-      address: "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
+      address: "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
       abi: [
         {
           anonymous: false,
@@ -678,10 +1432,10 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 7,
+      deployedOnBlock: 9,
     },
     IdentityRegistryStorage: {
-      address: "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
+      address: "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
       abi: [
         {
           anonymous: false,
@@ -1079,10 +1833,10 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 9,
+      deployedOnBlock: 11,
     },
     ModularCompliance: {
-      address: "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
+      address: "0x0165878A594ca255338adfa4d48449f69242Eb8F",
       abi: [
         {
           anonymous: false,
@@ -1432,10 +2186,10 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 11,
+      deployedOnBlock: 13,
     },
     TREXFactory: {
-      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      address: "0x7a2088a1bFc9d81c55368AE168C2C02570cB814F",
       abi: [
         {
           anonymous: false,
@@ -1740,10 +2494,866 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 1,
+      deployedOnBlock: 49,
+    },
+    TREXImplementationAuthority: {
+      address: "0x09635F643e140090A9A8Dcd712eD6285858ceBef",
+      abi: [
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_tokenImplementation",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "_ctrImplementation",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "_irImplementation",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "_irsImplementation",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "_tirImplementation",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "_mcImplementation",
+              type: "address",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "constructor",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "iaFactory",
+              type: "address",
+            },
+          ],
+          name: "IAFactorySet",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "_token",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "_newImplementationAuthority",
+              type: "address",
+            },
+          ],
+          name: "ImplementationAuthorityChanged",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "bool",
+              name: "referenceStatus",
+              type: "bool",
+            },
+            {
+              indexed: false,
+              internalType: "address",
+              name: "trexFactory",
+              type: "address",
+            },
+          ],
+          name: "ImplementationAuthoritySet",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "previousOwner",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "newOwner",
+              type: "address",
+            },
+          ],
+          name: "OwnershipTransferred",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "trexFactory",
+              type: "address",
+            },
+          ],
+          name: "TREXFactorySet",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              components: [
+                {
+                  internalType: "uint8",
+                  name: "major",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "minor",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "patch",
+                  type: "uint8",
+                },
+              ],
+              indexed: true,
+              internalType: "struct ITREXImplementationAuthority.Version",
+              name: "version",
+              type: "tuple",
+            },
+            {
+              components: [
+                {
+                  internalType: "address",
+                  name: "tokenImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "ctrImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "irImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "irsImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "tirImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "mcImplementation",
+                  type: "address",
+                },
+              ],
+              indexed: true,
+              internalType: "struct ITREXImplementationAuthority.TREXContracts",
+              name: "trex",
+              type: "tuple",
+            },
+          ],
+          name: "TREXVersionAdded",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              components: [
+                {
+                  internalType: "uint8",
+                  name: "major",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "minor",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "patch",
+                  type: "uint8",
+                },
+              ],
+              indexed: true,
+              internalType: "struct ITREXImplementationAuthority.Version",
+              name: "version",
+              type: "tuple",
+            },
+            {
+              components: [
+                {
+                  internalType: "address",
+                  name: "tokenImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "ctrImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "irImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "irsImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "tirImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "mcImplementation",
+                  type: "address",
+                },
+              ],
+              indexed: true,
+              internalType: "struct ITREXImplementationAuthority.TREXContracts",
+              name: "trex",
+              type: "tuple",
+            },
+          ],
+          name: "TREXVersionFetched",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              components: [
+                {
+                  internalType: "uint8",
+                  name: "major",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "minor",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "patch",
+                  type: "uint8",
+                },
+              ],
+              indexed: true,
+              internalType: "struct ITREXImplementationAuthority.Version",
+              name: "version",
+              type: "tuple",
+            },
+          ],
+          name: "VersionUpdated",
+          type: "event",
+        },
+        {
+          inputs: [
+            {
+              components: [
+                {
+                  internalType: "uint8",
+                  name: "major",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "minor",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "patch",
+                  type: "uint8",
+                },
+              ],
+              internalType: "struct ITREXImplementationAuthority.Version",
+              name: "",
+              type: "tuple",
+            },
+            {
+              components: [
+                {
+                  internalType: "address",
+                  name: "tokenImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "ctrImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "irImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "irsImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "tirImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "mcImplementation",
+                  type: "address",
+                },
+              ],
+              internalType: "struct ITREXImplementationAuthority.TREXContracts",
+              name: "",
+              type: "tuple",
+            },
+          ],
+          name: "addAndUseTREXVersion",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              components: [
+                {
+                  internalType: "uint8",
+                  name: "major",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "minor",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "patch",
+                  type: "uint8",
+                },
+              ],
+              internalType: "struct ITREXImplementationAuthority.Version",
+              name: "",
+              type: "tuple",
+            },
+            {
+              components: [
+                {
+                  internalType: "address",
+                  name: "tokenImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "ctrImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "irImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "irsImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "tirImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "mcImplementation",
+                  type: "address",
+                },
+              ],
+              internalType: "struct ITREXImplementationAuthority.TREXContracts",
+              name: "",
+              type: "tuple",
+            },
+          ],
+          name: "addTREXVersion",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "changeImplementationAuthority",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "ctrImplementation",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              components: [
+                {
+                  internalType: "uint8",
+                  name: "major",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "minor",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "patch",
+                  type: "uint8",
+                },
+              ],
+              internalType: "struct ITREXImplementationAuthority.Version",
+              name: "",
+              type: "tuple",
+            },
+          ],
+          name: "fetchVersion",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getCTRImplementation",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              components: [
+                {
+                  internalType: "uint8",
+                  name: "major",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "minor",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "patch",
+                  type: "uint8",
+                },
+              ],
+              internalType: "struct ITREXImplementationAuthority.Version",
+              name: "",
+              type: "tuple",
+            },
+          ],
+          name: "getContracts",
+          outputs: [
+            {
+              components: [
+                {
+                  internalType: "address",
+                  name: "tokenImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "ctrImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "irImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "irsImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "tirImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "mcImplementation",
+                  type: "address",
+                },
+              ],
+              internalType: "struct ITREXImplementationAuthority.TREXContracts",
+              name: "",
+              type: "tuple",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getCurrentVersion",
+          outputs: [
+            {
+              components: [
+                {
+                  internalType: "uint8",
+                  name: "major",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "minor",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "patch",
+                  type: "uint8",
+                },
+              ],
+              internalType: "struct ITREXImplementationAuthority.Version",
+              name: "",
+              type: "tuple",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getIRImplementation",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getIRSImplementation",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getMCImplementation",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getReferenceContract",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getTIRImplementation",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getTREXFactory",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getTokenImplementation",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "irImplementation",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "irsImplementation",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "isReferenceContract",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "mcImplementation",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "owner",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "renounceOwnership",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "setIAFactory",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "setTREXFactory",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "tirImplementation",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "tokenImplementation",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "newOwner",
+              type: "address",
+            },
+          ],
+          name: "transferOwnership",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              components: [
+                {
+                  internalType: "uint8",
+                  name: "major",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "minor",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "patch",
+                  type: "uint8",
+                },
+              ],
+              internalType: "struct ITREXImplementationAuthority.Version",
+              name: "",
+              type: "tuple",
+            },
+          ],
+          name: "useTREXVersion",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+      ],
+      inheritedFunctions: {},
+      deployedOnBlock: 51,
     },
     Token: {
-      address: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+      address: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
       abi: [
         {
           anonymous: false,
@@ -2829,10 +4439,10 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 3,
+      deployedOnBlock: 5,
     },
     TrustedIssuersRegistry: {
-      address: "0x0165878A594ca255338adfa4d48449f69242Eb8F",
+      address: "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853",
       abi: [
         {
           anonymous: false,
@@ -3102,7 +4712,7 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 13,
+      deployedOnBlock: 15,
     },
   },
   11155111: {
@@ -5595,6 +7205,810 @@ const deployedContracts = {
       ],
       inheritedFunctions: {},
       deployedOnBlock: 9066277,
+    },
+    TREXImplementationAuthority: {
+      address: "0x23a4CbeB9516D12a33d09809933AC5fff7D35754",
+      abi: [
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_tokenImplementation",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "_ctrImplementation",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "_irImplementation",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "_irsImplementation",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "_tirImplementation",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "_mcImplementation",
+              type: "address",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "constructor",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "iaFactory",
+              type: "address",
+            },
+          ],
+          name: "IAFactorySet",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "_token",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "_newImplementationAuthority",
+              type: "address",
+            },
+          ],
+          name: "ImplementationAuthorityChanged",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "bool",
+              name: "referenceStatus",
+              type: "bool",
+            },
+            {
+              indexed: false,
+              internalType: "address",
+              name: "trexFactory",
+              type: "address",
+            },
+          ],
+          name: "ImplementationAuthoritySet",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "trexFactory",
+              type: "address",
+            },
+          ],
+          name: "TREXFactorySet",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              components: [
+                {
+                  internalType: "uint8",
+                  name: "major",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "minor",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "patch",
+                  type: "uint8",
+                },
+              ],
+              indexed: true,
+              internalType: "struct ITREXImplementationAuthority.Version",
+              name: "version",
+              type: "tuple",
+            },
+            {
+              components: [
+                {
+                  internalType: "address",
+                  name: "tokenImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "ctrImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "irImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "irsImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "tirImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "mcImplementation",
+                  type: "address",
+                },
+              ],
+              indexed: true,
+              internalType: "struct ITREXImplementationAuthority.TREXContracts",
+              name: "trex",
+              type: "tuple",
+            },
+          ],
+          name: "TREXVersionAdded",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              components: [
+                {
+                  internalType: "uint8",
+                  name: "major",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "minor",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "patch",
+                  type: "uint8",
+                },
+              ],
+              indexed: true,
+              internalType: "struct ITREXImplementationAuthority.Version",
+              name: "version",
+              type: "tuple",
+            },
+            {
+              components: [
+                {
+                  internalType: "address",
+                  name: "tokenImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "ctrImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "irImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "irsImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "tirImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "mcImplementation",
+                  type: "address",
+                },
+              ],
+              indexed: true,
+              internalType: "struct ITREXImplementationAuthority.TREXContracts",
+              name: "trex",
+              type: "tuple",
+            },
+          ],
+          name: "TREXVersionFetched",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              components: [
+                {
+                  internalType: "uint8",
+                  name: "major",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "minor",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "patch",
+                  type: "uint8",
+                },
+              ],
+              indexed: true,
+              internalType: "struct ITREXImplementationAuthority.Version",
+              name: "version",
+              type: "tuple",
+            },
+          ],
+          name: "VersionUpdated",
+          type: "event",
+        },
+        {
+          inputs: [
+            {
+              components: [
+                {
+                  internalType: "uint8",
+                  name: "major",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "minor",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "patch",
+                  type: "uint8",
+                },
+              ],
+              internalType: "struct ITREXImplementationAuthority.Version",
+              name: "",
+              type: "tuple",
+            },
+            {
+              components: [
+                {
+                  internalType: "address",
+                  name: "tokenImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "ctrImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "irImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "irsImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "tirImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "mcImplementation",
+                  type: "address",
+                },
+              ],
+              internalType: "struct ITREXImplementationAuthority.TREXContracts",
+              name: "",
+              type: "tuple",
+            },
+          ],
+          name: "addAndUseTREXVersion",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              components: [
+                {
+                  internalType: "uint8",
+                  name: "major",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "minor",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "patch",
+                  type: "uint8",
+                },
+              ],
+              internalType: "struct ITREXImplementationAuthority.Version",
+              name: "",
+              type: "tuple",
+            },
+            {
+              components: [
+                {
+                  internalType: "address",
+                  name: "tokenImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "ctrImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "irImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "irsImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "tirImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "mcImplementation",
+                  type: "address",
+                },
+              ],
+              internalType: "struct ITREXImplementationAuthority.TREXContracts",
+              name: "",
+              type: "tuple",
+            },
+          ],
+          name: "addTREXVersion",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "changeImplementationAuthority",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "ctrImplementation",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              components: [
+                {
+                  internalType: "uint8",
+                  name: "major",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "minor",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "patch",
+                  type: "uint8",
+                },
+              ],
+              internalType: "struct ITREXImplementationAuthority.Version",
+              name: "",
+              type: "tuple",
+            },
+          ],
+          name: "fetchVersion",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getCTRImplementation",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              components: [
+                {
+                  internalType: "uint8",
+                  name: "major",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "minor",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "patch",
+                  type: "uint8",
+                },
+              ],
+              internalType: "struct ITREXImplementationAuthority.Version",
+              name: "",
+              type: "tuple",
+            },
+          ],
+          name: "getContracts",
+          outputs: [
+            {
+              components: [
+                {
+                  internalType: "address",
+                  name: "tokenImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "ctrImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "irImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "irsImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "tirImplementation",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "mcImplementation",
+                  type: "address",
+                },
+              ],
+              internalType: "struct ITREXImplementationAuthority.TREXContracts",
+              name: "",
+              type: "tuple",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getCurrentVersion",
+          outputs: [
+            {
+              components: [
+                {
+                  internalType: "uint8",
+                  name: "major",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "minor",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "patch",
+                  type: "uint8",
+                },
+              ],
+              internalType: "struct ITREXImplementationAuthority.Version",
+              name: "",
+              type: "tuple",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getIRImplementation",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getIRSImplementation",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getMCImplementation",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getReferenceContract",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getTIRImplementation",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getTREXFactory",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getTokenImplementation",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "irImplementation",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "irsImplementation",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "isReferenceContract",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "mcImplementation",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "setIAFactory",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "setTREXFactory",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "tirImplementation",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "tokenImplementation",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              components: [
+                {
+                  internalType: "uint8",
+                  name: "major",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "minor",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint8",
+                  name: "patch",
+                  type: "uint8",
+                },
+              ],
+              internalType: "struct ITREXImplementationAuthority.Version",
+              name: "",
+              type: "tuple",
+            },
+          ],
+          name: "useTREXVersion",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+      ],
+      inheritedFunctions: {},
+      deployedOnBlock: 9069264,
     },
     Token: {
       address: "0x4D2F6d479Af24106E3F07E21C6BDCbebEBdF1b83",

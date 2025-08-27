@@ -3,7 +3,7 @@
 import React, { ChangeEvent, useState } from "react";
 import type { NextPage } from "next";
 import { useAccount } from "wagmi";
-import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
+import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 
 interface TokenDetails {
   owner: string;
@@ -31,14 +31,14 @@ interface Errors {
 const Deploy: NextPage = () => {
   const { address } = useAccount();
   const [tokenDetails, setTokenDetails] = useState<TokenDetails>({
-    owner: "0x3710a38d7310F0036a6094cC8b9aBae95Fcf2B20",
-    name: "TestToken",
-    symbol: "TTK",
-    decimals: "18",
-    irs: "0xaC279D30f6a2468C0b2C34d7f517b6142684d561",
-    ONCHAINID: "0xff3aD7ef7933d782F09dB4365E3644925B6dfc27",
-    irAgents: "0x3710a38d7310F0036a6094cC8b9aBae95Fcf2B20",
-    tokenAgents: "0x3710a38d7310F0036a6094cC8b9aBae95Fcf2B20",
+    owner: "",
+    name: "",
+    symbol: "",
+    decimals: "",
+    irs: "",
+    ONCHAINID: "",
+    irAgents: "",
+    tokenAgents: "",
     complianceModules: "",
     complianceSettings: "",
   });
@@ -47,7 +47,7 @@ const Deploy: NextPage = () => {
     issuers: "",
     issuerClaims: "",
   });
-  const [salt, setSalt] = useState<string>("my-first-token");
+  const [salt, setSalt] = useState<string>("salt1");
   const [errors, setErrors] = useState<Errors>({});
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -156,6 +156,19 @@ const Deploy: NextPage = () => {
           .map(claim => BigInt(claim.trim())),
       );
 
+    // 배열 길이 검증
+    if (issuersArray.length !== issuerClaimsArray.length) {
+      throw new Error("Number of issuers must match number of issuer claims arrays");
+    }
+
+    if (claimTopicsArray.length > 5) {
+      throw new Error("Maximum 5 claim topics allowed");
+    }
+
+    if (issuersArray.length > 5) {
+      throw new Error("Maximum 5 trusted issuers allowed");
+    }
+
     return {
       claimTopics: claimTopicsArray,
       issuers: issuersArray,
@@ -166,6 +179,12 @@ const Deploy: NextPage = () => {
   // Contract write hook
   const { writeContractAsync: deployTREXSuite, isMining } = useScaffoldWriteContract({
     contractName: "TREXFactory",
+  });
+
+  // Contract read hook for owner
+  const { data: contractOwner } = useScaffoldReadContract({
+    contractName: "TREXFactory",
+    functionName: "owner",
   });
 
   const handleDeploy = async () => {
@@ -185,9 +204,14 @@ const Deploy: NextPage = () => {
     }
 
     try {
+      const tokenDetailsPrepared = prepareTokenDetails();
+      const claimDetailsPrepared = prepareClaimDetails();
+      console.log("Token Details:", tokenDetailsPrepared);
+      console.log("Claim Details:", claimDetailsPrepared);
+
       await deployTREXSuite({
         functionName: "deployTREXSuite",
-        args: [salt, prepareTokenDetails(), prepareClaimDetails()],
+        args: [salt, tokenDetailsPrepared, claimDetailsPrepared],
       });
     } catch (error) {
       console.error("Deployment failed:", error);
@@ -197,7 +221,7 @@ const Deploy: NextPage = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-2xl mb-4">Deploy New ERC-3643 Token</h2>
+      <h2 className="text-2xl mb-4">Deploy New ERC-3643 Token (owner: {contractOwner})</h2>
       <form className="space-y-4">
         {/* Salt Input */}
         <div title="Salt for CREATE2 deployment">
@@ -236,10 +260,16 @@ const Deploy: NextPage = () => {
               placeholder="0x1234...5678"
               required
             />
+            <p className="text-xs text-gray-600 mt-1">
+              모든 컨트랙트(Token, IdentityRegistry, Compliance 등)의 소유자 주소. 이 주소는 컨트랙트 설정을 변경하고
+              관리할 수 있는 권한을 가짐.
+            </p>
             {errors.owner && <p className="text-red-500 text-xs">{errors.owner}</p>}
           </div>
           <div title="Name of the token">
-            <label className="block text-sm font-medium">Name (String):</label>
+            <label className="block text-sm font-medium">
+              Name (String) <span className="text-red-500">*</span>:
+            </label>
             <input
               type="text"
               name="name"
@@ -253,7 +283,9 @@ const Deploy: NextPage = () => {
             {errors.name && <p className="text-red-500 text-xs">{errors.name}</p>}
           </div>
           <div title="Symbol / ticker of the token">
-            <label className="block text-sm font-medium">Symbol (String):</label>
+            <label className="block text-sm font-medium">
+              Symbol (String) <span className="text-red-500">*</span>:
+            </label>
             <input
               type="text"
               name="symbol"
@@ -266,7 +298,9 @@ const Deploy: NextPage = () => {
             {errors.symbol && <p className="text-red-500 text-xs">{errors.symbol}</p>}
           </div>
           <div title="Decimals of the token (can be between 0 and 18)">
-            <label className="block text-sm font-medium">Decimals (Uint8):</label>
+            <label className="block text-sm font-medium">
+              Decimals (Uint8) <span className="text-red-500">*</span>:
+            </label>
             <input
               type="number"
               name="decimals"
@@ -288,6 +322,7 @@ const Deploy: NextPage = () => {
               className="mt-1 p-2 w-full border rounded-md"
               placeholder="0x1234...5678"
             />
+            <p className="text-xs text-gray-600 mt-1">Identity Registry Storage 컨트랙트의 주소.</p>
             {errors.irs && <p className="text-red-500 text-xs">{errors.irs}</p>}
           </div>
           <div title="ONCHAINID of the token">
@@ -300,6 +335,9 @@ const Deploy: NextPage = () => {
               className="mt-1 p-2 w-full border rounded-md"
               placeholder="0x1234...5678"
             />
+            <p className="text-xs text-gray-600 mt-1">
+              토큰 발행자의 OnchainID 컨트랙트 주소. 발행자의 신원 데이터를 저장.
+            </p>
             {errors.ONCHAINID && <p className="text-red-500 text-xs">{errors.ONCHAINID}</p>}
           </div>
           <div title="List of agents of the identity registry (can be set to an AgentManager contract)">
@@ -311,6 +349,10 @@ const Deploy: NextPage = () => {
               className="mt-1 p-2 w-full border rounded-md"
               placeholder="0x1234...5678,0x1234...5678"
             ></textarea>
+            <p className="text-xs text-gray-600 mt-1">
+              Identity Registry의 에이전트 주소들 (최대 5개). 이 주소들은 사용자 신원을 등록하고 관리할 수 있음. (ex.
+              KYC 검증 회사, 규제 기관, 토큰 발행자의 주소들)
+            </p>
           </div>
           <div title="List of agents of the token">
             <label className="block text-sm font-medium">Token Agents (Address[] - comma separated):</label>
@@ -321,6 +363,10 @@ const Deploy: NextPage = () => {
               className="mt-1 p-2 w-full border rounded-md"
               placeholder="0x1234...5678,0x1234...5678"
             ></textarea>
+            <p className="text-xs text-gray-600 mt-1">
+              토큰의 에이전트 주소들 (최대 5개). 이 주소들은 토큰 발행, 소각, 동결 등의 관리 기능을 수행할 수 있음. (ex.
+              토큰 발행자, 관리자, 규제 기관의 주소들)
+            </p>
           </div>
           <div title="Modules to bind to the compliance">
             <label className="block text-sm font-medium">Compliance Modules (Address[] - comma separated):</label>
@@ -331,6 +377,10 @@ const Deploy: NextPage = () => {
               className="mt-1 p-2 w-full border rounded-md"
               placeholder="0x1234...5678,0x1234...5678"
             ></textarea>
+            <p className="text-xs text-gray-600 mt-1">
+              토큰에 바인딩할 Compliance 모듈들의 주소 (최대 25개). 각 모듈은 특정 규제 요구사항을 처리. (ex. KYC 모듈,
+              AML 모듈, 지리적 제한 모듈, 보유량 제한 모듈 등)
+            </p>
           </div>
           <div title="Settings calls for compliance modules">
             <label className="block text-sm font-medium">Compliance Settings (Bytes[] - comma separated):</label>
@@ -341,6 +391,69 @@ const Deploy: NextPage = () => {
               className="mt-1 p-2 w-full border rounded-md"
               placeholder="0x1234...5678,0x1234...5678"
             ></textarea>
+            <p className="text-xs text-gray-600 mt-1">
+              Compliance 모듈들의 설정을 위한 함수 호출 데이터.
+              <br />• <strong>형식:</strong> 각 모듈의 설정 함수 호출을 0x로 시작하는 hex 문자열로 입력
+              <br />• <strong>예시:</strong> "0x12345678,0xabcdef12" (각각 다른 모듈의 설정 함수)
+              <br />• <strong>주의:</strong> Compliance Modules 배열의 순서와 일치해야 함.
+            </p>
+          </div>
+        </div>
+
+        {/* Claim Details Section */}
+        <div className="border-t pt-4">
+          <h3 className="text-lg font-semibold mb-4">Claim Details</h3>
+
+          <div title="Claim topics required (comma separated numbers)">
+            <label className="block text-sm font-medium">Claim Topics (Uint256[] - comma separated):</label>
+            <textarea
+              name="claim_claimTopics"
+              value={claimDetails.claimTopics}
+              onChange={handleChange}
+              className="mt-1 p-2 w-full border rounded-md"
+              placeholder="1,2,3"
+            ></textarea>
+            <p className="text-xs text-gray-600 mt-1">
+              토큰이 요구하는 claim topic들의 목록 (최대 5개). (ex. 1=KYC, 2=AML, 3=국적 등)
+            </p>
+            {errors.claim_claimTopics && <p className="text-red-500 text-xs">{errors.claim_claimTopics}</p>}
+          </div>
+
+          <div title="Trusted issuers addresses (comma separated)">
+            <label className="block text-sm font-medium">Issuers (Address[] - comma separated):</label>
+            <textarea
+              name="claim_issuers"
+              value={claimDetails.issuers}
+              onChange={handleChange}
+              className="mt-1 p-2 w-full border rounded-md"
+              placeholder="0x1234...5678,0x1234...5678"
+            ></textarea>
+            <p className="text-xs text-gray-600 mt-1">
+              신뢰할 수 있는 claim 발급자들의 주소 목록 (최대 5개). 이 주소들은 특정 claim topic에 대한 claim을 발급할
+              권한을 가짐. (ex. KYC 검증 회사, 규제 기관의 주소 등)
+            </p>
+            {errors.claim_issuers && <p className="text-red-500 text-xs">{errors.claim_issuers}</p>}
+          </div>
+
+          <div title="Claims that issuers are allowed to emit (format: topic1|topic2,topic3|topic4)">
+            <label className="block text-sm font-medium">
+              Issuer Claims (Uint256[][] - format: topic1|topic2,topic3|topic4):
+            </label>
+            <textarea
+              name="claim_issuerClaims"
+              value={claimDetails.issuerClaims}
+              onChange={handleChange}
+              className="mt-1 p-2 w-full border rounded-md"
+              placeholder="1|2,3|4"
+            ></textarea>
+            <p className="text-xs text-gray-600 mt-1">
+              각 issuer가 발급할 수 있는 claim topic들의 목록.
+              <br />• <strong>형식:</strong> 각 issuer의 claim topic들을 |로 구분하고, issuer들 사이는 쉼표로
+              구분합니다.
+              <br />• <strong>예시:</strong> "1|2,3|4"는 첫 번째 issuer는 topic 1과 2를, 두 번째 issuer는 topic 3과 4를
+              발급할 수 있음을 의미.
+            </p>
+            {errors.claim_issuerClaims && <p className="text-red-500 text-xs">{errors.claim_issuerClaims}</p>}
           </div>
         </div>
 
