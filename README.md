@@ -126,7 +126,7 @@ yarn deploy
 |               | Compliance Settings | 각 컴플라이언스 모듈에 전달할 설정 값(예: 화이트리스트, 한도 등), 각 모듈의 설정 함수 호출을 위한 hex 문자열 | ["0x12345678"]                                                                                            |
 | Claim Details | Claim Topics        | 신원 인증에 필요한 클레임 주제(Claim Topic)들의 목록                                                         | [1, 2, 3]                                                                                                 |
 |               | Issuers             | 각 Claim Topic에 대해 신원을 인증할 수 있는 발급자(issuer) 주소 목록                                         | ["0x6666...6666", "0x7777...7777"]                                                                        |
-|               | Issuer Claims       | 각 issuer가 발급한 클레임의 상세 정보(예: 만료일, claim type 등)                                             | [[1,2],[3]]                                                                                               |
+|               | Issuer Claims       | 각 issuer가 발급할 수 있는 Claim Topic 목록                                                                  | [[1,2],[3]]                                                                                               |
 
 ![deploy1](/images/deploy1.png)
 ![deploy2](/images/deploy2.png)
@@ -135,6 +135,90 @@ yarn deploy
 **[RWA Token Deploying Sequence]**
 
 ![architecture](/images/architecture.png)
+
+```solidity
+// TREXFactory.sol
+function deployTREXSuite(string memory _salt, TokenDetails calldata _tokenDetails, ClaimDetails calldata
+		_claimDetails)
+	external override onlyOwner {
+    // 조건 확인
+		require(tokenDeployed[_salt] == address(0)
+			, "token already deployed"); // salt 값이 고유한지 확인 (중복 배포 방지)
+		require((_claimDetails.issuers).length == (_claimDetails.issuerClaims).length
+			, "claim pattern not valid"); // 발급자와 각 발급자에 해당하는 클레임 목록이 맞게 설정되었는지 확인
+		require((_claimDetails.issuers).length <= 5
+			, "max 5 claim issuers at deployment"); // 발급자가 5명 이하인지 확인
+		require((_claimDetails.claimTopics).length <= 5
+			, "max 5 claim topics at deployment"); // 클레임 목록이 5개 이하인지 확인
+		require((_tokenDetails.irAgents).length <= 5 && (_tokenDetails.tokenAgents).length <= 5
+			, "max 5 agents at deployment"); // 각 에이전트가 5명 이하인지 확인
+		require((_tokenDetails.complianceModules).length <= 30
+			, "max 30 module actions at deployment"); // 컴플라이언스가 30개 이하인지 확인
+		require((_tokenDetails.complianceModules).length >= (_tokenDetails.complianceSettings).length
+			, "invalid compliance pattern"); // 컴플라이언스 개수보다 설정 함수의 개수가 많지 않은지 확인
+
+    // 핵심 컴포넌트 배포
+		ITrustedIssuersRegistry tir = ITrustedIssuersRegistry(_deployTIR(_salt, _implementationAuthority));
+		IClaimTopicsRegistry ctr = IClaimTopicsRegistry(_deployCTR(_salt, _implementationAuthority));
+		IModularCompliance mc = IModularCompliance(_deployMC(_salt, _implementationAuthority));
+		IIdentityRegistryStorage irs;
+		if (_tokenDetails.irs == address(0)) {
+			irs = IIdentityRegistryStorage(_deployIRS(_salt, _implementationAuthority));
+		}
+		else {
+			irs = IIdentityRegistryStorage(_tokenDetails.irs);
+		}
+		IIdentityRegistry ir = IIdentityRegistry(_deployIR(_salt, _implementationAuthority, address(tir),
+			address(ctr), address(irs))); // TIR, CTR, IRS와 연결
+		IToken token = IToken(_deployToken
+		(
+			_salt,
+			_implementationAuthority,
+			address(ir),
+			address(mc),
+			_tokenDetails.name,
+			_tokenDetails.symbol,
+			_tokenDetails.decimals,
+			_tokenDetails.ONCHAINID
+		)); // IR, MC, Token 기본 정보와 연결
+
+    // Claim & Issuer 등록
+		for (uint256 i = 0; i < (_claimDetails.claimTopics).length; i++) {
+			ctr.addClaimTopic(_claimDetails.claimTopics[i]);
+		}
+		for (uint256 i = 0; i < (_claimDetails.issuers).length; i++) {
+			tir.addTrustedIssuer(IClaimIssuer((_claimDetails).issuers[i]), _claimDetails.issuerClaims[i]);
+		}
+		irs.bindIdentityRegistry(address(ir));
+		AgentRole(address(ir)).addAgent(address(token));
+		for (uint256 i = 0; i < (_tokenDetails.irAgents).length; i++) {
+			AgentRole(address(ir)).addAgent(_tokenDetails.irAgents[i]);
+		}
+		for (uint256 i = 0; i < (_tokenDetails.tokenAgents).length; i++) {
+			AgentRole(address(token)).addAgent(_tokenDetails.tokenAgents[i]);
+		}
+
+    // Compliance 모듈 처리
+		for (uint256 i = 0; i < (_tokenDetails.complianceModules).length; i++) {
+			if (!mc.isModuleBound(_tokenDetails.complianceModules[i])) {
+				mc.addModule(_tokenDetails.complianceModules[i]);
+			}
+			if (i < (_tokenDetails.complianceSettings).length) {
+				mc.callModuleFunction(_tokenDetails.complianceSettings[i], _tokenDetails.complianceModules[i]);
+			}
+		}
+
+		tokenDeployed[_salt] = address(token); // 토큰 주소 매핑 저장
+
+    // 소유권 이전 (배포자 → 지정된 owner)
+		(Ownable(address(token))).transferOwnership(_tokenDetails.owner);
+		(Ownable(address(ir))).transferOwnership(_tokenDetails.owner);
+		(Ownable(address(tir))).transferOwnership(_tokenDetails.owner);
+		(Ownable(address(ctr))).transferOwnership(_tokenDetails.owner);
+		(Ownable(address(mc))).transferOwnership(_tokenDetails.owner);
+		emit TREXSuiteDeployed(address(token), address(ir), address(irs), address(tir), address(ctr), address(mc), _salt);
+	}
+```
 
 ---
 
