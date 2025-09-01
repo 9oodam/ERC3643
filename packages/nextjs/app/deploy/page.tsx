@@ -47,7 +47,7 @@ const Deploy: NextPage = () => {
     issuers: "",
     issuerClaims: "",
   });
-  const [salt, setSalt] = useState<string>("salt1");
+  const [salt, setSalt] = useState<string>("");
   const [errors, setErrors] = useState<Errors>({});
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

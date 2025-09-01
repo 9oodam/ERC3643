@@ -16,6 +16,8 @@ const deployYourContract: DeployFunction = async function (hre: HardhatRuntimeEn
     autoMine: true,
   });
 
+  // -------------------------------------------
+
   // 구현체 컨트랙트들 배포
   const factory = await deploy("TREXFactory", {
     from: deployer,
@@ -66,6 +68,9 @@ const deployYourContract: DeployFunction = async function (hre: HardhatRuntimeEn
     autoMine: true,
   });
 
+  // -------------------------------------------
+
+  // 위에서 배포한 구현체 컨트랙트를 관리하는 중앙 권한 컨트랙트 배포
   const authority = await deploy("TREXImplementationAuthority", {
     from: deployer,
     args: [token.address, ctr.address, ir.address, irs.address, tir.address, mc.address],

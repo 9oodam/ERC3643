@@ -21,7 +21,6 @@ const Load: NextPage = () => {
   const { address } = useAccount();
   const [tokenAddress, setTokenAddress] = useState<string>("");
   const [salt, setSalt] = useState<string>("");
-  const [mintAmount, setMintAmount] = useState<string>("1000");
   const [tokenInfo, setTokenInfo] = useState<TokenInfo | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
