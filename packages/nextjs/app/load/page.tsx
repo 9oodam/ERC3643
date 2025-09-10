@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import type { NextPage } from "next";
-import { useAccount, useReadContract } from "wagmi";
+import { useAccount, useReadContract, useWalletClient } from "wagmi";
 import { useScaffoldContract, useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 
 interface TokenInfo {
@@ -19,18 +19,35 @@ interface TokenInfo {
 
 const Load: NextPage = () => {
   const { address } = useAccount();
+  const { data: walletClient } = useWalletClient();
+
+  // token 정보
   const [tokenAddress, setTokenAddress] = useState<string>("");
   const [salt, setSalt] = useState<string>("");
   const [tokenInfo, setTokenInfo] = useState<TokenInfo | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  // Contract write hook
+  // Identity 등록 관련
+  const [registerAddress, setRegisterAddress] = useState<string>("");
+  const [registerCountry, setRegisterCountry] = useState<string>("840"); // US 코드 예시
+  const [identityAddress, setIdentityAddress] = useState<string>("");
+
+  // mint 관련
+  const [mintAmount, setMintAmount] = useState<string>("");
+  const [mintTo, setMintTo] = useState<string>("");
+
+  // Transfer 관련
+  const [transferTo, setTransferTo] = useState<string>("");
+  const [transferAmount, setTransferAmount] = useState<string>("");
+
+  // --------------------------------------------------------
+
+  // Contract read hook
   const { data: trexFactoryData } = useScaffoldReadContract({
     contractName: "TREXFactory",
     functionName: "getToken",
     args: [salt],
   });
-
   const { data: tokenContract } = useScaffoldContract({
     contractName: "Token",
   });
@@ -81,16 +98,8 @@ const Load: NextPage = () => {
   const { data: isVerified } = useReadContract({
     functionName: "isVerified",
     abi: irContract?.abi,
-    address: tokenAddress,
+    address: identityRegistryAddress as `0x${string}`,
     args: [address],
-  });
-
-  // Contract write hooks
-  const { writeContractAsync: registerIdentity, isMining: isRegistering } = useScaffoldWriteContract({
-    contractName: "IdentityRegistry",
-  });
-  const { writeContractAsync: mint, isMining: isMinting } = useScaffoldWriteContract({
-    contractName: "Token",
   });
 
   useEffect(() => {
@@ -118,6 +127,8 @@ const Load: NextPage = () => {
     args: [salt],
   });
 
+  // --------------------------------------------------------
+
   // Salt 로 token address 찾기
   const handleGetToken = async () => {
     if (!salt.trim()) {
@@ -138,6 +149,150 @@ const Load: NextPage = () => {
       alert("Error getting token address");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Identity 등록 함수
+  const handleRegisterIdentity = async () => {
+    if (!identityRegistryAddress || !registerAddress || !identityAddress || !walletClient) {
+      alert("Please enter user address and identity address");
+      return;
+    }
+
+    if (!tokenInfo?.isAgent) {
+      alert("Only agents can register identities");
+      return;
+    }
+
+    console.log(identityRegistryAddress);
+
+    try {
+      await walletClient.writeContract({
+        address: identityRegistryAddress as `0x${string}`,
+        abi: [
+          {
+            inputs: [
+              { internalType: "address", name: "_userAddress", type: "address" },
+              { internalType: "contract IIdentity", name: "_identity", type: "address" },
+              { internalType: "uint16", name: "_country", type: "uint16" },
+            ],
+            name: "registerIdentity",
+            outputs: [],
+            stateMutability: "nonpayable",
+            type: "function",
+          },
+        ],
+        functionName: "registerIdentity",
+        args: [registerAddress, identityAddress, parseInt(registerCountry)],
+      });
+      alert("Identity registered successfully!");
+      setRegisterAddress("");
+      setIdentityAddress("");
+    } catch (error) {
+      console.error("Error registering identity:", error);
+      alert("Error registering identity. Make sure the identity contract exists.");
+    }
+  };
+
+  // 토큰 발행
+  const handleMint = async () => {
+    if (!mintTo || !mintAmount || !walletClient || !tokenAddress) {
+      alert("Please enter recipient address and amount");
+      return;
+    }
+
+    if (!tokenInfo?.isAgent) {
+      alert("Only agents can mint tokens");
+      return;
+    }
+
+    try {
+      const amount = ethers.parseUnits(mintAmount, tokenInfo.decimals);
+      await walletClient?.writeContract({
+        address: tokenAddress as `0x${string}`,
+        functionName: "mint",
+        abi: [
+          {
+            inputs: [
+              {
+                internalType: "address",
+                name: "_to",
+                type: "address",
+              },
+              {
+                internalType: "uint256",
+                name: "_amount",
+                type: "uint256",
+              },
+            ],
+            name: "mint",
+            outputs: [],
+            stateMutability: "nonpayable",
+            type: "function",
+          },
+        ],
+        args: [mintTo, amount],
+      });
+      alert("Tokens minted successfully!");
+      setMintAmount("");
+      setMintTo("");
+    } catch (error) {
+      console.error("Error minting tokens:", error);
+      alert("Error minting tokens. Make sure the recipient is verified.");
+    }
+  };
+
+  // 토큰 전송 함수
+  const handleTransfer = async () => {
+    if (!transferTo || !transferAmount || !walletClient || !tokenAddress) {
+      alert("Please enter recipient address and amount");
+      return;
+    }
+
+    if (!tokenInfo?.isVerified) {
+      alert("You must be verified to transfer tokens");
+      return;
+    }
+
+    try {
+      const amount = ethers.parseUnits(transferAmount, tokenInfo.decimals);
+      await walletClient?.writeContract({
+        address: tokenAddress as `0x${string}`,
+        functionName: "transfer",
+        abi: [
+          {
+            inputs: [
+              {
+                internalType: "address",
+                name: "_to",
+                type: "address",
+              },
+              {
+                internalType: "uint256",
+                name: "_amount",
+                type: "uint256",
+              },
+            ],
+            name: "transfer",
+            outputs: [
+              {
+                internalType: "bool",
+                name: "",
+                type: "bool",
+              },
+            ],
+            stateMutability: "nonpayable",
+            type: "function",
+          },
+        ],
+        args: [transferTo, amount],
+      });
+      alert("Tokens transferred successfully!");
+      setTransferAmount("");
+      setTransferTo("");
+    } catch (error) {
+      console.error("Error transferring tokens:", error);
+      alert("Error transferring tokens. Make sure the recipient is verified and you have sufficient balance.");
     }
   };
 
@@ -272,6 +427,149 @@ const Load: NextPage = () => {
               </p>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Identity Registration */}
+      {tokenInfo && tokenInfo.isAgent && (
+        <div className="bg-base-100 p-6 rounded-lg shadow-lg mb-6">
+          <h2 className="text-xl font-semibold mb-4">Register Identity</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            Register a new identity in the Identity Registry before minting tokens.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">User Address</label>
+              <input
+                type="text"
+                value={registerAddress}
+                onChange={e => setRegisterAddress(e.target.value)}
+                placeholder="0x..."
+                className="w-full p-3 border rounded-lg"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Identity Contract Address</label>
+              <input
+                type="text"
+                value={identityAddress}
+                onChange={e => setIdentityAddress(e.target.value)}
+                placeholder="0x..."
+                className="w-full p-3 border rounded-lg"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Country Code</label>
+              <select
+                value={registerCountry}
+                onChange={e => setRegisterCountry(e.target.value)}
+                className="w-full p-3 border rounded-lg"
+              >
+                <option value="840">US (840)</option>
+                <option value="410">KR (410)</option>
+                <option value="392">JP (392)</option>
+                <option value="156">CN (156)</option>
+              </select>
+            </div>
+          </div>
+
+          <button
+            onClick={handleRegisterIdentity}
+            disabled={!registerAddress || !identityAddress}
+            className="px-6 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 disabled:opacity-50"
+          >
+            Register Identity"
+          </button>
+        </div>
+      )}
+
+      {/* Mint Tokens */}
+      {tokenInfo && tokenInfo.isAgent && (
+        <div className="bg-base-100 p-6 rounded-lg shadow-lg mb-6">
+          <h2 className="text-xl font-semibold mb-4">Mint Tokens</h2>
+          <p className="text-sm text-gray-600 mb-4">As an agent, you can mint tokens to verified addresses.</p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">Recipient Address</label>
+              <input
+                type="text"
+                value={mintTo}
+                onChange={e => setMintTo(e.target.value)}
+                placeholder="0x..."
+                className="w-full p-3 border rounded-lg"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Amount</label>
+              <input
+                type="number"
+                value={mintAmount}
+                onChange={e => setMintAmount(e.target.value)}
+                placeholder="1000"
+                className="w-full p-3 border rounded-lg"
+              />
+            </div>
+          </div>
+
+          <button
+            onClick={handleMint}
+            disabled={!mintTo || !mintAmount}
+            className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50"
+          >
+            {`Mint ${mintAmount || "0"} ${tokenInfo.symbol}`}
+          </button>
+        </div>
+      )}
+
+      {/* Transfer Tokens */}
+      {tokenInfo && tokenInfo.isVerified && (
+        <div className="bg-base-100 p-6 rounded-lg shadow-lg mb-6">
+          <h2 className="text-xl font-semibold mb-4">Transfer Tokens</h2>
+          <p className="text-sm text-gray-600 mb-4">Transfer your tokens to other verified addresses.</p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">Recipient Address</label>
+              <input
+                type="text"
+                value={transferTo}
+                onChange={e => setTransferTo(e.target.value)}
+                placeholder="0x..."
+                className="w-full p-3 border rounded-lg"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Amount</label>
+              <input
+                type="number"
+                value={transferAmount}
+                onChange={e => setTransferAmount(e.target.value)}
+                placeholder="100"
+                max={tokenInfo.balance}
+                className="w-full p-3 border rounded-lg"
+              />
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <p className="text-sm text-gray-600">
+              Available Balance: {tokenInfo.balance} {tokenInfo.symbol}
+            </p>
+          </div>
+
+          <button
+            onClick={handleTransfer}
+            disabled={!transferTo || !transferAmount || parseFloat(transferAmount) > parseFloat(tokenInfo.balance)}
+            className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
+          >
+            {`Transfer ${transferAmount || "0"} ${tokenInfo.symbol}`}
+          </button>
         </div>
       )}
 
